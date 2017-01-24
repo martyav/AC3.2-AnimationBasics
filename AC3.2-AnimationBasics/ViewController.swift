@@ -13,6 +13,11 @@ class ViewController: UIViewController {
     static let animationDuration: TimeInterval = 2.0
     static let squareSize = CGSize(width: 100.0, height: 100.0)
     
+    let blueAnimator = UIViewPropertyAnimator(duration: animationDuration, curve: .linear, animations: nil)
+    let greenAnimator = UIViewPropertyAnimator(duration: animationDuration, curve: .easeIn, animations: nil)
+    let yellowAnimator = UIViewPropertyAnimator(duration: animationDuration, curve: .easeInOut, animations: nil)
+    let orangeAnimator = UIViewPropertyAnimator(duration: animationDuration, curve: .easeOut, animations: nil)
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -27,6 +32,7 @@ class ViewController: UIViewController {
     }
     
     private func configureConstraints() {
+        let _ = [darkBlueView, greenView, yellowView, orangeView].map { $0.snp.removeConstraints() }
         
         // blue
         darkBlueView.snp.makeConstraints { (view) in
@@ -90,47 +96,25 @@ class ViewController: UIViewController {
     // MARK: Property Animator
     internal func animateViews() {
         if !animateButton.isSelected {
-            self.animateDarkBlueViewWithSnapkit()
-            self.animateGreenViewWithSnapkit()
-            self.animateOrangeViewWithSnapkit()
-            self.animateYellowViewWithSnapkit()
+            animateBlueViewWithAnimator()
+            animateGreenViewWithAnimator()
+            animateOrangeViewWithAnimator()
+            animateYellowViewWithAnimator()
         } else {
-            // blue
-            
-            darkBlueView.snp.remakeConstraints { (view) in
-                view.leading.equalToSuperview().offset(20.0)
-                view.top.equalToSuperview().offset(20.0)
-                view.size.equalTo(ViewController.squareSize)
+            blueAnimator.addCompletion { (position: UIViewAnimatingPosition) in
+                switch position {
+                case .start:
+                    print("start")
+                case .current:
+                    print("animating...")
+                case .end:
+                    print("end")
+                }
             }
-            
-            // green
-            
-            greenView.snp.remakeConstraints { (view) in
-                view.leading.equalToSuperview().offset(20.0)
-                view.top.equalTo(darkBlueView.snp.bottom).offset(20.0)
-                view.size.equalTo(ViewController.squareSize)
-            }
-            
-            // yellow
-            
-            yellowView.snp.remakeConstraints { (view) in
-                view.leading.equalToSuperview().offset(20.0)
-                view.top.equalTo(greenView.snp.bottom).offset(20.0)
-                view.size.equalTo(ViewController.squareSize)
-            }
-            
-            // orange
-            
-            orangeView.snp.remakeConstraints { (view) in
-                view.leading.equalToSuperview().offset(20.0)
-                view.top.equalTo(yellowView.snp.bottom).offset(20.0)
-                view.size.equalTo(ViewController.squareSize)
-            }
-            
-            let animator = UIViewPropertyAnimator(duration: 0.25, curve: .linear) {
+            configureConstraints()
+            let animator = UIViewPropertyAnimator(duration: 0.20, curve: .linear) {
                 self.view.layoutIfNeeded()
             }
-            
             animator.startAnimation()
         }
         
@@ -158,10 +142,26 @@ class ViewController: UIViewController {
         animator.startAnimation()
     }
     
+    internal func animateBlueViewWithAnimator() {
+        
+        self.darkBlueView.snp.remakeConstraints { (view) in
+            view.trailing.equalToSuperview().inset(20.0)
+            view.top.equalToSuperview().offset(20.0)
+            view.size.equalTo(ViewController.squareSize)
+        }
+        
+        blueAnimator.addAnimations {
+            self.view.layoutIfNeeded()
+        }
+        
+        blueAnimator.startAnimation()
+    }
+    
     internal func animateGreenViewWithSnapkit() {
         self.greenView.snp.remakeConstraints {
-            (view) in view.trailing.equalToSuperview().inset(20)
-            view.bottom.equalToSuperview()
+            (view) in
+            view.trailing.equalToSuperview().inset(20)
+            view.top.equalTo(darkBlueView.snp.bottom).offset(20)
             view.size.equalTo(ViewController.squareSize)
         }
         
@@ -173,11 +173,26 @@ class ViewController: UIViewController {
         animator.startAnimation()
     }
     
+    internal func animateGreenViewWithAnimator() {
+        
+        self.greenView.snp.remakeConstraints { (view) in
+            view.trailing.equalToSuperview().inset(20.0)
+            view.top.equalTo(darkBlueView.snp.bottom).offset(20.0)
+            view.size.equalTo(ViewController.squareSize)
+        }
+        
+        greenAnimator.addAnimations {
+            self.view.layoutIfNeeded()
+        }
+        
+        greenAnimator.startAnimation()
+    }
+    
     internal func animateYellowViewWithSnapkit() {
         self.yellowView.snp.remakeConstraints {
             (view) in
             view.trailing.equalToSuperview().inset(20)
-            view.top.equalToSuperview().offset(285)
+            view.top.equalTo(greenView.snp.bottom).offset(20)
             view.size.equalTo(ViewController.squareSize)
         }
         
@@ -189,10 +204,26 @@ class ViewController: UIViewController {
         animator.startAnimation()
     }
     
+    internal func animateYellowViewWithAnimator() {
+        
+        self.yellowView.snp.remakeConstraints { (view) in
+            view.trailing.equalToSuperview().inset(20.0)
+            view.top.equalTo(greenView.snp.bottom).offset(20.0)
+            view.size.equalTo(ViewController.squareSize)
+        }
+        
+        yellowAnimator.addAnimations {
+            self.view.layoutIfNeeded()
+        }
+        
+        yellowAnimator.startAnimation()
+    }
+    
     internal func animateOrangeViewWithSnapkit() {
         self.orangeView.snp.remakeConstraints {
             (view) in
-            view.bottom.equalToSuperview()
+            view.trailing.equalToSuperview().inset(20)
+            view.top.equalTo(yellowView.snp.bottom).offset(20)
             view.size.equalTo(ViewController.squareSize)
         }
         
@@ -204,7 +235,20 @@ class ViewController: UIViewController {
         animator.startAnimation()
     }
     
-    
+    internal func animateOrangeViewWithAnimator() {
+        
+        self.orangeView.snp.remakeConstraints { (view) in
+            view.trailing.equalToSuperview().inset(20.0)
+            view.top.equalTo(yellowView.snp.bottom).offset(20.0)
+            view.size.equalTo(ViewController.squareSize)
+        }
+        
+        orangeAnimator.addAnimations {
+            self.view.layoutIfNeeded()
+        }
+        
+        orangeAnimator.startAnimation()
+    }
     
     // MARK: Frames
     internal func animateDarkBlueViewWithFrames() {
