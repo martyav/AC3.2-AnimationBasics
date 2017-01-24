@@ -101,16 +101,6 @@ class ViewController: UIViewController {
             animateOrangeViewWithAnimator()
             animateYellowViewWithAnimator()
         } else {
-            blueAnimator.addCompletion { (position: UIViewAnimatingPosition) in
-                switch position {
-                case .start:
-                    print("start")
-                case .current:
-                    print("animating...")
-                case .end:
-                    print("end")
-                }
-            }
             configureConstraints()
             let animator = UIViewPropertyAnimator(duration: 0.20, curve: .linear) {
                 self.view.layoutIfNeeded()
